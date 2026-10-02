@@ -29,12 +29,13 @@
   .lead{color:var(--muted); margin:0 0 18px; font-size:15px}
   .eyebrow{font-family:"Oswald",sans-serif; font-weight:700; letter-spacing:1.5px; font-size:11px; color:var(--pink); text-transform:uppercase; margin:0 0 6px}
 
-  nav.switch{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 18px}
+  nav.switch{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:0 0 18px}
   nav.switch a{
-    font-family:"Oswald",sans-serif; font-weight:600; letter-spacing:.6px; font-size:12px;
+    font-family:"Oswald",sans-serif; font-weight:600; letter-spacing:1px; font-size:12px;
     text-transform:uppercase; text-decoration:none; color:var(--text);
-    border:1px solid var(--line); border-radius:999px; padding:8px 14px; background:var(--panel);
+    border:1px solid var(--line); border-radius:999px; padding:8px 16px; background:var(--panel);
   }
+  nav.switch a:hover{border-color:var(--pink); color:var(--pink)}
   nav.switch a.current{background:var(--pink); color:var(--ink-on-pink); border-color:var(--pink)}
 
   .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:0 0 14px}
@@ -115,6 +116,7 @@
   <nav class="switch">
     <a href="https://bygg.tech-utenkaos.no">Bygg challenge</a>
     <a class="current" href="https://navn.tech-utenkaos.no">Bygg navn</a>
+    <a href="https://hook.tech-utenkaos.no">Bygg hook</a>
     <a href="https://tracker.tech-utenkaos.no">Tracker</a>
   </nav>
 
