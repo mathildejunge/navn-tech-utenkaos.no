@@ -1,420 +1,257 @@
-<!DOCTYPE html>
-<html lang="nb">
+<!doctype html>
+<html lang="no">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bygg navnet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#000000; --panel:#0e0e0e; --panel2:#151515; --line:#2a2a2a;
-    --text:#ffffff; --muted:#9a9a9a; --pink:#ff66c4; --pink-soft:#2a1020;
-    --ink-on-pink:#000000;
+    --bg:#000; --card:#111; --card2:#181818; --line:#2a2a2a; --text:#fff; --muted:#a8a8a8;
+    --pink:#ff66c4; --pinkText:#000; --chip:#1c1c1c; --input:#161616;
   }
   :root[data-theme="light"]{
-    --bg:#ffffff; --panel:#ffffff; --panel2:#faf3f8; --line:#ead8e5;
-    --text:#1a1a1a; --muted:#6b6b6b; --pink:#d6248f; --pink-soft:#fbe7f3;
-    --ink-on-pink:#ffffff;
+    --bg:#fff; --card:#f7f7f7; --card2:#fff; --line:#e3e3e3; --text:#000; --muted:#5c5c5c;
+    --chip:#fff; --input:#fff;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:"Nunito Sans",system-ui,sans-serif; line-height:1.5;
-    padding:20px 16px 80px;
-  }
-  .wrap{max-width:760px; margin:0 auto}
-  h1{font-family:"Oswald",sans-serif; font-weight:700; letter-spacing:.5px; font-size:26px; margin:6px 0 2px}
-  .lead{color:var(--muted); margin:0 0 18px; font-size:15px}
-  .eyebrow{font-family:"Oswald",sans-serif; font-weight:700; letter-spacing:1.5px; font-size:11px; color:var(--pink); text-transform:uppercase; margin:0 0 6px}
-
-  nav.switch{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:0 0 18px}
-  nav.switch a{
-    font-family:"Oswald",sans-serif; font-weight:600; letter-spacing:1px; font-size:12px;
-    text-transform:uppercase; text-decoration:none; color:var(--text);
-    border:1px solid var(--line); border-radius:999px; padding:8px 16px; background:var(--panel);
-  }
-  nav.switch a:hover{border-color:var(--pink); color:var(--pink)}
-  nav.switch a.current{background:var(--pink); color:var(--ink-on-pink); border-color:var(--pink)}
-
-  .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:0 0 14px}
-  .toggle{display:inline-flex; background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:4px}
-  .toggle button{
-    font-family:"Oswald",sans-serif; font-weight:600; letter-spacing:.5px; font-size:12px; text-transform:uppercase;
-    border:0; background:transparent; color:var(--muted); padding:7px 16px; border-radius:999px; cursor:pointer;
-  }
-  .toggle button.on{background:var(--pink); color:var(--ink-on-pink)}
-  .tools{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
-  .tools .hint{color:var(--muted); font-size:12px}
-  .btn{
-    font-family:"Oswald",sans-serif; font-weight:600; letter-spacing:.6px; font-size:12px; text-transform:uppercase;
-    border:1px solid var(--line); background:var(--panel); color:var(--text); padding:8px 14px; border-radius:10px; cursor:pointer;
-  }
-  .btn.pink{background:var(--pink); color:var(--ink-on-pink); border-color:var(--pink)}
-
-  .panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; margin:0 0 16px}
-  .panel .eyebrow{margin-bottom:4px}
-  .panel .desc{color:var(--muted); font-size:14px; margin:0 0 14px}
-
-  .slots{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
-  @media(max-width:620px){ .slots{grid-template-columns:1fr} }
-  .slot{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--panel2); position:relative}
-  .slot label{display:block; font-family:"Oswald",sans-serif; font-weight:600; letter-spacing:1px; font-size:10px; text-transform:uppercase; color:var(--pink); margin:0 0 6px}
-  .slot input{
-    width:100%; border:0; background:transparent; color:var(--text);
-    font-family:"Oswald",sans-serif; font-weight:700; letter-spacing:.5px; font-size:18px; text-transform:uppercase; padding:2px 24px 2px 0;
-  }
-  .slot input:focus{outline:none}
-  .slot input::placeholder{color:var(--muted); text-transform:none; font-family:"Nunito Sans",sans-serif; font-weight:400; font-size:14px; letter-spacing:0}
-  .slot .clear{position:absolute; top:8px; right:8px; border:0; background:transparent; color:var(--muted); font-size:18px; cursor:pointer; line-height:1}
-
-  .suggest{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border-top:1px solid var(--line); margin-top:16px; padding-top:14px}
-  .suggest .s-label{font-family:"Oswald",sans-serif; font-weight:700; letter-spacing:1px; font-size:11px; color:var(--muted); text-transform:uppercase; margin-right:8px}
-  .suggest .s-val{font-family:"Oswald",sans-serif; font-weight:700; font-size:20px; letter-spacing:.5px}
-  .suggest .s-left{display:flex; align-items:baseline; gap:6px; flex-wrap:wrap}
-
-  .steprow{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 4px}
-  .chip{
-    font-family:"Nunito Sans",sans-serif; font-weight:600; font-size:14px;
-    border:1px solid var(--line); background:var(--panel2); color:var(--text);
-    padding:8px 14px; border-radius:999px; cursor:pointer;
-  }
-  .chip.on{background:var(--pink); color:var(--ink-on-pink); border-color:var(--pink)}
-  .chip .x{margin-left:8px; opacity:.7}
-  .addrow{display:flex; gap:8px; margin:12px 0 2px}
-  .addrow input{
-    flex:1; border:1px solid var(--line); background:var(--panel2); color:var(--text);
-    border-radius:10px; padding:10px 12px; font-family:"Nunito Sans",sans-serif; font-size:14px;
-  }
-  .addrow input::placeholder{color:var(--muted)}
-  .addrow input:focus{outline:1px solid var(--pink)}
-
-  .finalwrap{background:var(--pink); border-radius:16px; padding:18px; color:var(--ink-on-pink)}
-  .finalwrap .eyebrow{color:var(--ink-on-pink); opacity:.85}
-  .finalwrap input{
-    width:100%; border:0; border-bottom:2px solid rgba(0,0,0,.25); background:transparent; color:var(--ink-on-pink);
-    font-family:"Oswald",sans-serif; font-weight:700; font-size:22px; letter-spacing:.5px; padding:8px 0;
-  }
-  .finalwrap input::placeholder{color:rgba(0,0,0,.4); font-family:"Nunito Sans",sans-serif; font-weight:400; font-style:italic; font-size:16px; letter-spacing:0}
-  :root[data-theme="light"] .finalwrap input::placeholder{color:rgba(255,255,255,.7)}
-  .finalwrap input:focus{outline:none}
-  .finalbar{display:flex; align-items:center; justify-content:space-between; margin-top:10px}
-  .finalbar .count{font-size:12px; opacity:.8}
-  .finalbar .save{
-    font-family:"Oswald",sans-serif; font-weight:700; letter-spacing:.6px; font-size:12px; text-transform:uppercase;
-    border:0; background:#000; color:#fff; padding:9px 16px; border-radius:10px; cursor:pointer;
-  }
-  :root[data-theme="light"] .finalbar .save{background:#fff; color:#1a1a1a}
-  .saved-note{font-size:13px; color:var(--pink); margin-top:10px; min-height:18px}
-  .tip{font-size:13px; color:var(--muted); margin:10px 2px 0}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Outfit,system-ui,sans-serif;font-size:15px;line-height:1.5}
+  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 60px}
+  nav.top{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:6px 0 26px}
+  nav.top a{font-family:Oswald,sans-serif;text-transform:uppercase;font-size:12px;letter-spacing:.04em;color:var(--text);text-decoration:none;padding:7px 13px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
+  nav.top a.on{background:var(--pink);color:#000;border-color:var(--pink)}
+  h1{font-family:Oswald,sans-serif;font-weight:700;font-size:30px;margin:0 0 4px}
+  .lead{color:var(--muted);margin:0 0 18px}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .seg{display:inline-flex;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .seg button{border:0;background:transparent;color:var(--text);font-family:Oswald,sans-serif;text-transform:uppercase;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer}
+  .seg button.on{background:var(--pink);color:#000}
+  .tools{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+  .btn{font-family:Oswald,sans-serif;text-transform:uppercase;font-size:12px;letter-spacing:.03em;border:1px solid var(--line);background:var(--chip);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer}
+  .btn.pink{background:var(--pink);border-color:var(--pink);color:#000}
+  .btn.dark{background:#000;border-color:#000;color:#fff}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .lbl{font-family:Oswald,sans-serif;text-transform:uppercase;font-size:12px;letter-spacing:.06em;color:var(--pink);margin:0 0 2px}
+  .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  input[type=text]{width:100%;background:var(--input);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:10px 12px;font:inherit}
+  input[type=text]:focus{outline:2px solid var(--pink);outline-offset:0;border-color:transparent}
+  .opt{color:var(--muted);font-family:Outfit,sans-serif;text-transform:none;letter-spacing:0;font-size:12px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--line);background:var(--chip);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+  .chip.on{background:var(--pink);border-color:var(--pink);color:#000}
+  .ex{font-size:12px;color:var(--muted);margin-top:6px}
+  .ex b{color:var(--text);font-weight:500}
+  .list{display:grid;gap:8px}
+  .name{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;color:var(--text);font:inherit;width:100%}
+  .name:hover{border-color:var(--pink)}
+  .name.on{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink)}
+  .name .t{font-family:Oswald,sans-serif;font-weight:600;font-size:18px;line-height:1.25}
+  .name .m{font-size:11px;color:var(--muted);white-space:nowrap}
+  .name .m.long{color:var(--pink)}
+  .empty{color:var(--muted);font-size:14px;padding:6px 0}
+  .final{background:var(--pink);color:#000;border-radius:14px;padding:16px;margin-bottom:10px}
+  .final .lbl{color:#000}
+  .final input{background:transparent;border:0;border-bottom:1px solid rgba(0,0,0,.35);border-radius:0;color:#000;font-family:Oswald,sans-serif;font-weight:600;font-size:22px;padding:6px 0}
+  .final input:focus{outline:none;border-bottom-color:#000}
+  .final .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px}
+  .saved{margin-top:10px;font-size:13px}
+  .tip{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+  @media (max-width:520px){ h1{font-size:25px} .name .t{font-size:16px} }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <nav class="switch">
+  <nav class="top">
     <a href="https://bygg.tech-utenkaos.no">Bygg challenge</a>
-    <a class="current" href="https://navn.tech-utenkaos.no">Bygg navn</a>
+    <a href="https://navn.tech-utenkaos.no" class="on">Bygg navn</a>
     <a href="https://hook.tech-utenkaos.no">Bygg hook</a>
     <a href="https://tracker.tech-utenkaos.no">Tracker</a>
   </nav>
 
   <h1>Bygg navnet ditt</h1>
-  <p class="lead">Sett sammen et navn fra de tre bankene, eller skriv rett inn i feltene. Du former alltid det endelige navnet selv nederst.</p>
+  <p class="lead">Fyll inn det du skrev i setningen din på dag 1, så får du navneforslag som sier hva hun får. Tapp det du liker, og pynt på det nederst.</p>
 
-  <div class="topbar">
-    <div class="toggle" id="modeToggle">
-      <button data-mode="challenge" class="on">Challenge</button>
-      <button data-mode="fellesskap">Fellesskap</button>
+  <div class="bar">
+    <div class="seg" id="mode">
+      <button data-v="challenge" class="on">Challenge</button>
+      <button data-v="community">Community</button>
     </div>
     <div class="tools">
-      <span class="hint">Lagres automatisk</span>
-      <button class="btn" id="themeBtn">Lyst tema</button>
-      <button class="btn" id="resetBtn">Nullstill</button>
+      <span>Lagres automatisk</span>
+      <button class="btn" id="theme">Lyst tema</button>
+      <button class="btn" id="reset">Nullstill</button>
     </div>
   </div>
 
-  <!-- NAVNET DITT -->
-  <div class="panel">
-    <div class="eyebrow">Navnet ditt</div>
-    <p class="desc">Skriv rett inn, eller tapp ord i bankene under så fyller de seg inn her. Du trenger ikke fylle alle tre.</p>
-    <div class="slots">
-      <div class="slot">
-        <label>Åpningsord</label>
-        <input id="slot0" type="text" placeholder="f.eks. Min" autocomplete="off">
-        <button class="clear" data-clear="0" title="Tøm">×</button>
+  <div class="card">
+    <div class="field">
+      <p class="lbl">1 · Hva får hun?</p>
+      <p class="hint">Resultatet, med dine ord. Skriv det sånn at det passer etter «5 dager til ...»</p>
+      <input type="text" id="res" placeholder="f.eks. mer ro">
+      <div class="ex">Eksempler: <b>mer ro</b>, <b>harmoniske morgener</b>, <b>trygghet med tarotkortene</b>, <b>din egen challenge</b></div>
+    </div>
+    <div class="field">
+      <p class="lbl">2 · Hva skal hun klare? <span class="opt">valgfritt</span></p>
+      <p class="hint">Skriv det som om du sier det til henne.</p>
+      <input type="text" id="verb" placeholder="f.eks. si nei">
+      <div class="ex">Eksempler: <b>si nei</b>, <b>les kortene dine selv</b>, <b>lag din egen challenge</b></div>
+    </div>
+    <div class="field">
+      <p class="lbl">3 · Hvor står hun nå? <span class="opt">valgfritt</span></p>
+      <p class="hint">Ett eller to ord om det hun vil vekk fra.</p>
+      <input type="text" id="fra" placeholder="f.eks. stress">
+      <div class="ex">Eksempler: <b>stress</b>, <b>kaos</b>, <b>usikkerhet</b>, <b>tomt ark</b></div>
+    </div>
+    <div class="field">
+      <p class="lbl">4 · Hva slipper hun? <span class="opt">valgfritt</span></p>
+      <p class="hint">Det hun gruer seg til, eller tror hun må gjennom.</p>
+      <input type="text" id="uten" placeholder="f.eks. dårlig samvittighet">
+      <div class="ex">Eksempler: <b>dårlig samvittighet</b>, <b>å stå opp tidligere</b>, <b>teknisk kaos</b></div>
+    </div>
+    <div class="field">
+      <p class="lbl">5 · Hvem er den for? <span class="opt">valgfritt</span></p>
+      <input type="text" id="hvem" placeholder="f.eks. nevromammaer">
+    </div>
+    <div class="field" id="daysField">
+      <p class="lbl">6 · Hvor mange dager?</p>
+      <div class="chips" id="days">
+        <button class="chip" data-v="3">3 dager</button>
+        <button class="chip" data-v="5">5 dager</button>
+        <button class="chip" data-v="7">7 dager</button>
       </div>
-      <div class="slot">
-        <label>Ditt nøkkelord</label>
-        <input id="slot1" type="text" placeholder="f.eks. Business" autocomplete="off">
-        <button class="clear" data-clear="1" title="Tøm">×</button>
-      </div>
-      <div class="slot">
-        <label>Hva det gir</label>
-        <input id="slot2" type="text" placeholder="f.eks. Sprint" autocomplete="off">
-        <button class="clear" data-clear="2" title="Tøm">×</button>
-      </div>
-    </div>
-    <div class="suggest">
-      <div class="s-left">
-        <span class="s-label">Forslag</span>
-        <span class="s-val" id="suggestVal">...</span>
-      </div>
-      <button class="btn pink" id="useBtn">Bruk dette ↓</button>
     </div>
   </div>
 
-  <!-- STEG 1 -->
-  <div class="panel">
-    <div class="eyebrow">1 · Åpningsord</div>
-    <p class="desc">Et kort ord som leder an. Tapp et, eller legg til ditt eget.</p>
-    <div class="steprow" id="bank0"></div>
-    <div class="addrow">
-      <input id="add0" type="text" placeholder="skriv et åpningsord, f.eks. Modig" autocomplete="off">
-      <button class="btn" data-add="0">Legg til</button>
-    </div>
+  <div class="card">
+    <p class="lbl">Navneforslag</p>
+    <p class="hint">Tapp et forslag for å velge det. Alle kan endres nederst.</p>
+    <div class="list" id="list"></div>
   </div>
 
-  <!-- STEG 2 -->
-  <div class="panel">
-    <div class="eyebrow">2 · Dine nøkkelord</div>
-    <p class="desc">Ordene som beskriver akkurat din greie. Legg inn dine egne.</p>
-    <div class="addrow">
-      <input id="add1" type="text" placeholder="skriv et nøkkelord, f.eks. synlighet" autocomplete="off">
-      <button class="btn" data-add="1">Legg til</button>
+  <div class="final">
+    <p class="lbl">✨ Navnet jeg går for</p>
+    <input type="text" id="final" placeholder="Tapp et forslag, eller skriv ditt eget">
+    <div class="row">
+      <span id="count">0 tegn</span>
+      <button class="btn dark" id="save">Lagre navnet</button>
     </div>
-    <div class="steprow" id="bank1" style="margin-top:12px"></div>
+    <div class="saved" id="saved"></div>
   </div>
-
-  <!-- STEG 3 -->
-  <div class="panel">
-    <div class="eyebrow">3 · Hva det gir</div>
-    <p class="desc">Ordet som sier hva de sitter igjen med, eller formatet. Tapp et, eller legg til ditt eget.</p>
-    <div class="steprow" id="bank2"></div>
-    <div class="addrow">
-      <input id="add2" type="text" placeholder="skriv et format, f.eks. Verksted" autocomplete="off">
-      <button class="btn" data-add="2">Legg til</button>
-    </div>
-  </div>
-
-  <!-- NAVNET JEG GÅR FOR -->
-  <div class="finalwrap">
-    <div class="eyebrow">✨ Navnet jeg går for</div>
-    <input id="finalName" type="text" placeholder="hent forslaget over, eller skriv ditt eget" autocomplete="off">
-    <div class="finalbar">
-      <span class="count"><span id="charCount">0</span> tegn</span>
-      <button class="save" id="saveBtn">Lagre navnet</button>
-    </div>
-    <div class="saved-note" id="savedNote"></div>
-  </div>
-
-  <p class="tip">Tips: korte navn er sterkest, og navnet bør si resultatet, ikke verktøyet. Forslaget er bare en start, du pynter på det siste ordet selv.</p>
-
+  <p class="tip">Tips: korte navn er sterkest, og navnet bør si resultatet, ikke verktøyet. Hvis de andre i communityet gjetter hva de får, fungerer navnet 💗</p>
 </div>
 
 <script>
 (function(){
-  "use strict";
-  var KEY = "tuk-name-builder-v4";
+  var KEY = 'tuk-navn-v2';
+  var ids = ['res','verb','fra','uten','hvem','final'];
+  var state = { mode:'challenge', days:'5', theme:'dark', saved:'' };
+  ids.forEach(function(k){ state[k] = ''; });
 
-  var PRESETS = {
-    opener: ["Min","Nye","Start","Enkel","Smart","Trygg","Rolig","Hverdags","Ekte","Fri","Første","Neste","Åpne","Indre","Klar","Sterk","Bygg"],
-    keyword: ["Business","Tech","AI","Synlighet","Innhold"],
-    format: {
-      challenge: ["Challenge","Utfordring","Sprint","Uke","Kickstart","Bootcamp","Reise","Boost","Serie","Kurs","Løfte"],
-      fellesskap: ["Community","Klubb","Rom","Sirkel","Flokk","Lag","Hus","Sted","Reise"]
+  function load(){ try{ var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if(s){ for(var k in s){ state[k] = s[k]; } } }catch(e){} }
+  function store(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  function clean(s){ return (s || '').trim().replace(/\s+/g,' ').replace(/[.!]+$/,''); }
+  function cap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function low(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  function oneWord(s){ return s && s.indexOf(' ') === -1; }
+  function dropMer(s){ return s.replace(/^(mer|mye mer|litt mer)\s+/i,''); }
+
+  function build(){
+    var N = low(clean(state.res)), V = low(clean(state.verb)), F = low(clean(state.fra)),
+        U = low(clean(state.uten)), H = low(clean(state.hvem));
+    var D = state.days + ' dager';
+    var out = [];
+    function add(s, why){ if(s && out.every(function(o){ return o.t.toLowerCase() !== s.toLowerCase(); })) out.push({ t:s, why:why }); }
+
+    if(state.mode === 'challenge'){
+      if(N){
+        add(D + ' til ' + N, 'Dager + resultat');
+        add(cap(N) + ' på ' + D, 'Resultat + tid');
+      }
+      if(V){
+        add(cap(V) + ' på ' + D, 'Handling + tid');
+      }
+      if(F && N) add('Fra ' + F + ' til ' + N, 'Fra, til');
+      if(F && N) add('Fra ' + F + ' til ' + N + ' på ' + D, 'Fra, til + tid');
+      if(N && U) add(cap(N) + ', uten ' + U, 'Resultat + det hun slipper');
+      if(V && U) add(cap(V) + ', uten ' + U, 'Handling + det hun slipper');
+      if(N && H) add(cap(N) + ' for ' + H, 'Resultat + hvem');
+      if(N && H) add(D + ' til ' + N + ' for ' + H, 'Dager + resultat + hvem');
+      if(N){
+        var core = dropMer(N);
+        if(oneWord(core)) add(cap(core) + '-uka', 'Kort og fengende');
+        if(oneWord(core)) add(D + ' med ' + core, 'Dager + kjerneordet');
+      }
+    } else {
+      if(N && H) add(cap(N) + ' for ' + H, 'Resultat + hvem');
+      if(H) add('Communityet for ' + H, 'Hvem det er for');
+      if(N){
+        var c2 = dropMer(N);
+        if(oneWord(c2)) add(cap(c2) + '-klubben', 'Kort og fengende');
+        add(cap(N) + ' sammen', 'Resultat + fellesskap');
+        add(cap(N) + ' i hverdagen', 'Resultat + hverdag');
+      }
+      if(F && N) add('Fra ' + F + ' til ' + N, 'Fra, til');
+      if(N && U) add(cap(N) + ', uten ' + U, 'Resultat + det hun slipper');
+      if(V) add(cap(V) + ', sammen', 'Handling + fellesskap');
     }
-  };
+    return out;
+  }
 
-  var state = {
-    mode: "challenge",
-    theme: "dark",
-    slots: ["","",""],
-    final: "",
-    banks: [ PRESETS.opener.slice(), PRESETS.keyword.slice(), PRESETS.format.challenge.slice() ]
-  };
-
-  // ---- storage ----
-  function load(){
-    try{
-      var raw = localStorage.getItem(KEY);
-      if(raw){ var s = JSON.parse(raw); if(s && typeof s === "object"){ Object.assign(state, s); } }
-    }catch(e){}
-    if(!Array.isArray(state.banks) || state.banks.length !== 3){
-      state.banks = [ PRESETS.opener.slice(), PRESETS.keyword.slice(), PRESETS.format[state.mode].slice() ];
+  var list = document.getElementById('list');
+  function render(){
+    var names = build();
+    list.innerHTML = '';
+    if(!names.length){
+      list.innerHTML = '<div class="empty">Skriv hva hun får i felt 1, så dukker forslagene opp her.</div>';
     }
-  }
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
-
-  // ---- helpers ----
-  function cap(str){ return str ? str.charAt(0).toUpperCase() + str.slice(1) : str; }
-  function buildSuggestion(){
-    var o = (state.slots[0]||"").trim();
-    var k = (state.slots[1]||"").trim();
-    var f = (state.slots[2]||"").trim();
-    var mid = [k,f].filter(Boolean).join("-");
-    var parts = [];
-    if(o) parts.push(o);
-    if(mid) parts.push(mid);
-    if(!parts.length) return "...";
-    var joined = parts.join(" ").toLowerCase();
-    return cap(joined);
-  }
-
-  // ---- render ----
-  var el = function(id){ return document.getElementById(id); };
-
-  function renderSlots(){
-    for(var i=0;i<3;i++){ el("slot"+i).value = state.slots[i] || ""; }
-    el("suggestVal").textContent = buildSuggestion();
-  }
-
-  function renderBanks(){
-    for(var i=0;i<3;i++){
-      var box = el("bank"+i);
-      box.innerHTML = "";
-      var slotVal = (state.slots[i]||"").toLowerCase();
-      state.banks[i].forEach(function(word){
-        var chip = document.createElement("button");
-        chip.className = "chip" + (word.toLowerCase()===slotVal ? " on":"");
-        chip.type = "button";
-        var span = document.createElement("span");
-        span.textContent = word;
-        chip.appendChild(span);
-        chip.addEventListener("click", function(){
-          state.slots[i] = (state.slots[i].toLowerCase()===word.toLowerCase()) ? "" : word;
-          save(); renderSlots(); renderBanks();
-        });
-        // custom (non-preset) chips get a tiny remove x
-        if(!isPreset(i, word)){
-          var x = document.createElement("span");
-          x.className = "x"; x.textContent = "×";
-          x.addEventListener("click", function(ev){
-            ev.stopPropagation();
-            state.banks[i] = state.banks[i].filter(function(w){ return w!==word; });
-            if((state.slots[i]||"").toLowerCase()===word.toLowerCase()) state.slots[i]="";
-            save(); renderSlots(); renderBanks();
-          });
-          chip.appendChild(x);
-        }
-        box.appendChild(chip);
+    names.forEach(function(n){
+      var b = document.createElement('button');
+      b.className = 'name' + (clean(state.final).toLowerCase() === n.t.toLowerCase() ? ' on' : '');
+      var len = n.t.length;
+      b.innerHTML = '<span class="t"></span><span class="m' + (len > 40 ? ' long' : '') + '"></span>';
+      b.querySelector('.t').textContent = n.t;
+      b.querySelector('.m').textContent = len > 40 ? len + ' tegn, litt langt' : len + ' tegn';
+      b.title = n.why;
+      b.addEventListener('click', function(){
+        state.final = n.t; document.getElementById('final').value = n.t; store(); render(); updCount();
       });
-    }
-  }
-
-  function isPreset(i, word){
-    var base = i===0 ? PRESETS.opener : i===1 ? PRESETS.keyword : PRESETS.format[state.mode];
-    return base.some(function(w){ return w.toLowerCase()===word.toLowerCase(); });
-  }
-
-  function renderFinal(){
-    el("finalName").value = state.final || "";
-    el("charCount").textContent = (state.final||"").length;
-  }
-
-  function renderTheme(){
-    document.documentElement.setAttribute("data-theme", state.theme);
-    el("themeBtn").textContent = state.theme==="dark" ? "Lyst tema" : "Mørkt tema";
-  }
-
-  function renderMode(){
-    var btns = document.querySelectorAll("#modeToggle button");
-    btns.forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-mode")===state.mode); });
-  }
-
-  // ---- events ----
-  function wire(){
-    // slot direct typing
-    for(var i=0;i<3;i++){
-      (function(i){
-        el("slot"+i).addEventListener("input", function(){
-          state.slots[i] = this.value;
-          el("suggestVal").textContent = buildSuggestion();
-          save();
-        });
-        el("slot"+i).addEventListener("blur", renderBanks);
-      })(i);
-    }
-    // clear buttons
-    document.querySelectorAll(".clear").forEach(function(b){
-      b.addEventListener("click", function(){
-        var i = parseInt(this.getAttribute("data-clear"),10);
-        state.slots[i] = ""; save(); renderSlots(); renderBanks();
-      });
+      list.appendChild(b);
     });
-    // add-your-own for each step
-    document.querySelectorAll("[data-add]").forEach(function(b){
-      b.addEventListener("click", function(){
-        var i = parseInt(this.getAttribute("data-add"),10);
-        addWord(i);
-      });
-    });
-    for(var j=0;j<3;j++){
-      (function(j){
-        el("add"+j).addEventListener("keydown", function(ev){
-          if(ev.key==="Enter"){ ev.preventDefault(); addWord(j); }
-        });
-      })(j);
-    }
-    // use suggestion
-    el("useBtn").addEventListener("click", function(){
-      var s = buildSuggestion();
-      if(s && s!=="..."){ state.final = s; save(); renderFinal(); flashSaved("Forslaget er lagt inn nedenfor, juster det gjerne."); }
-    });
-    // final field
-    el("finalName").addEventListener("input", function(){
-      state.final = this.value; el("charCount").textContent = this.value.length; save();
-    });
-    el("saveBtn").addEventListener("click", function(){
-      save();
-      flashSaved(state.final ? "Lagret: " + state.final : "Skriv inn et navn først.");
-    });
-    // theme
-    el("themeBtn").addEventListener("click", function(){
-      state.theme = state.theme==="dark" ? "light" : "dark"; save(); renderTheme();
-    });
-    // reset
-    el("resetBtn").addEventListener("click", function(){
-      if(!confirm("Nullstille alt? Da tømmes ordene og navnet du har bygget.")) return;
-      state.slots = ["","",""]; state.final = "";
-      state.banks = [ PRESETS.opener.slice(), PRESETS.keyword.slice(), PRESETS.format[state.mode].slice() ];
-      save(); renderAll();
-      flashSaved("Nullstilt.");
-    });
-    // mode toggle
-    document.querySelectorAll("#modeToggle button").forEach(function(b){
-      b.addEventListener("click", function(){
-        var m = this.getAttribute("data-mode");
-        if(m===state.mode) return;
-        // swap only the preset part of bank 3, keep custom additions
-        var customFormats = state.banks[2].filter(function(w){ return !isPreset(2,w); });
-        state.mode = m;
-        state.banks[2] = PRESETS.format[m].slice().concat(customFormats);
-        save(); renderMode(); renderBanks();
-      });
-    });
+    document.querySelectorAll('#mode button').forEach(function(x){ x.classList.toggle('on', x.dataset.v === state.mode); });
+    document.querySelectorAll('#days .chip').forEach(function(x){ x.classList.toggle('on', x.dataset.v === state.days); });
+    document.getElementById('daysField').style.display = state.mode === 'challenge' ? '' : 'none';
+    document.documentElement.setAttribute('data-theme', state.theme);
+    document.getElementById('theme').textContent = state.theme === 'light' ? 'Mørkt tema' : 'Lyst tema';
+    document.getElementById('saved').textContent = state.saved ? 'Lagret: ' + state.saved + ' 💗' : '';
   }
+  function updCount(){ document.getElementById('count').textContent = clean(state.final).length + ' tegn'; }
 
-  function addWord(i){
-    var input = el("add"+i);
-    var val = (input.value||"").trim();
-    if(!val) return;
-    var exists = state.banks[i].some(function(w){ return w.toLowerCase()===val.toLowerCase(); });
-    if(!exists){ state.banks[i].push(cap(val)); }
-    state.slots[i] = cap(val);
-    input.value = "";
-    save(); renderSlots(); renderBanks();
-  }
-
-  function flashSaved(msg){
-    var n = el("savedNote"); n.textContent = msg;
-    clearTimeout(n._t); n._t = setTimeout(function(){ n.textContent=""; }, 3500);
-  }
-
-  function renderAll(){ renderTheme(); renderMode(); renderSlots(); renderBanks(); renderFinal(); }
-
-  load(); wire(); renderAll();
+  load();
+  ids.forEach(function(k){
+    var el = document.getElementById(k);
+    el.value = state[k] || '';
+    el.addEventListener('input', function(){ state[k] = el.value; store(); if(k === 'final'){ updCount(); } render(); });
+  });
+  document.querySelectorAll('#mode button').forEach(function(b){
+    b.addEventListener('click', function(){ state.mode = b.dataset.v; store(); render(); });
+  });
+  document.querySelectorAll('#days .chip').forEach(function(b){
+    b.addEventListener('click', function(){ state.days = b.dataset.v; store(); render(); });
+  });
+  document.getElementById('theme').addEventListener('click', function(){ state.theme = state.theme === 'light' ? 'dark' : 'light'; store(); render(); });
+  document.getElementById('save').addEventListener('click', function(){ state.saved = clean(state.final); store(); render(); });
+  document.getElementById('reset').addEventListener('click', function(){
+    var b = this;
+    if(b.dataset.sure !== '1'){ b.dataset.sure = '1'; b.textContent = 'Sikker? Trykk igjen'; setTimeout(function(){ b.dataset.sure=''; b.textContent='Nullstill'; }, 3000); return; }
+    ids.forEach(function(k){ state[k] = ''; document.getElementById(k).value = ''; });
+    state.saved = ''; state.days = '5'; b.dataset.sure=''; b.textContent='Nullstill'; store(); render(); updCount();
+  });
+  render(); updCount();
 })();
 </script>
 </body>
