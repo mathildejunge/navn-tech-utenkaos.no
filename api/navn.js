@@ -1,0 +1,150 @@
+// Vercel serverless-funksjon: lager navn og undertitler med Claude.
+// Krever miljøvariabelen ANTHROPIC_API_KEY i Vercel (Settings > Environment Variables).
+
+const MODEL = 'claude-sonnet-5-5';
+
+const SYSTEM = `Du er en norsk navne- og tittelstrateg for små, kvinnelige gründere som lager challenger og communityer. Du kan posisjonering, tekstforfatting og psykologien bak hvorfor folk melder seg på (Hormozi sin verdiligning: stort ønsket resultat, høy tro på at det funker for MEG, kort tid, lite innsats).
+
+DIN JOBB
+Brukeren forteller hva challengen eller communityet gir, hvem det er for, og gjerne hva målgruppen tviler på. Du lager 8 forslag. Hvert forslag har:
+- navn: selve navnet. Kort, 2 til 6 ord, lett å si høyt og huske.
+- undertittel: én setning som selger påmeldingen. Snakker direkte til henne med «du» og «din». Maks 14 ord.
+
+Først: forstå hva dette egentlig handler om. Hvem er hun, hva drømmer hun om, og hva er det hun sier til seg selv som stopper henne («jeg kan ikke male», «jeg er ikke teknisk», «jeg har ikke tid»)? Det beste navnet treffer resultatet hun vil ha. Den beste undertittelen fjerner tvilen hennes.
+
+VARIER MELLOM DISSE VINKLENE (bruk minst 6 forskjellige)
+1. Resultat + tid: hva hun sitter igjen med, og hvor fort.
+2. Første gang: «Ditt første ...», for den som aldri har gjort det før.
+3. Selv om: resultatet, selv om hun tror hun ikke kan.
+4. Fra, til: fra der hun står i dag, til der hun vil.
+5. Uten innvendingen: resultatet uten det hun gruer seg til.
+6. Identitet: hvem hun blir eller får lov å være.
+7. Kort merkenavn: ett eller to fengende ord som kan bli et begrep (f.eks. «Malepausen», «Ro-uka»).
+8. Nysgjerrighet: noe som gjør at hun må vite mer.
+9. For hvem: navnet sier tydelig hvem det er for.
+
+REGLER
+- Navnet skal si resultatet, ikke verktøyet eller metoden.
+- Alltid du-form til henne. Aldri «hun», «hun får» eller «deltakerne» i teksten.
+- Bruk antall dager bare når det er oppgitt, og bruk akkurat det tallet.
+- Naturlig, muntlig norsk bokmål, sånn en norsk dame faktisk snakker. Aldri oversatt engelsk. Riktig rettskrivning og standard bokmålsformer.
+- Aldri tankestrek (– eller —), aldri semikolon og aldri kolon i navnet. Bruk komma eller punktum.
+- Ikke bruk formen «ikke X, men Y».
+- Ingen emoji, ingen hashtags, ingen anførselstegn rundt navnet.
+- Ingen hype og ingen tomme ord som «ultimate», «magisk», «revolusjonerende», «lås opp», «hemmeligheten», «transformasjon», «reise».
+- Ikke lov noe innholdet ikke kan levere, og ikke finn opp tall eller resultater.
+- Lim aldri brukerens ord ordrett inn i en mal. Skriv om, rett skrivefeil og gjør det bedre.
+- Er det et community og ikke en challenge, lag navn som fungerer over tid (ikke bundet til dager).
+
+Lever ALLTID de 8 forslagene ved å kalle verktøyet lever_navn, og skriv ingenting annet. «vinkel» er det norske navnet på vinkelen du brukte.`;
+
+const TOOL = {
+  name: 'lever_navn',
+  description: 'Leverer de ferdige navneforslagene.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      forslag: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            vinkel: { type: 'string', description: 'Vinkelen som er brukt, på norsk' },
+            navn: { type: 'string', description: 'Selve navnet, 2 til 6 ord' },
+            undertittel: { type: 'string', description: 'Én setning i du-form, maks 14 ord' }
+          },
+          required: ['vinkel', 'navn', 'undertittel']
+        }
+      }
+    },
+    required: ['forslag']
+  }
+};
+
+function tidy(s) {
+  return String(s || '')
+    .replace(/^["«“]+|["»”]+$/g, '')
+    .replace(/\s*[–—]\s*/g, ', ')
+    .replace(/;/g, ',')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function clean(list) {
+  return list.map(function (f) {
+    return { vinkel: tidy(f.vinkel), navn: tidy(f.navn).replace(/[.]+$/, ''), undertittel: tidy(f.undertittel) };
+  }).filter(function (f) { return f.navn; });
+}
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Bruk POST' });
+    return;
+  }
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) {
+    res.status(500).json({ error: 'API-nøkkelen mangler på serveren.' });
+    return;
+  }
+
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) { body = {}; }
+  }
+  function f(k, max) { return String((body && body[k]) || '').trim().slice(0, max); }
+  const res1 = f('resultat', 300);
+  const hvem = f('hvem', 200);
+  const tvil = f('tvil', 300);
+  const mer = f('mer', 600);
+  const mode = body && body.mode === 'community' ? 'community' : 'challenge';
+  const days = ['3', '5', '7'].indexOf(String(body && body.days)) > -1 ? String(body.days) : '';
+
+  if (res1.length < 3) {
+    res.status(400).json({ error: 'Skriv hva hun sitter igjen med først.' });
+    return;
+  }
+
+  const userMsg =
+    'Type: ' + (mode === 'community' ? 'community (varer over tid)' : 'challenge') + '\n' +
+    (mode === 'challenge' && days ? 'Antall dager: ' + days + '\n' : '') +
+    'Hva hun sitter igjen med: ' + res1 + '\n' +
+    (hvem ? 'Hvem det er for: ' + hvem + '\n' : '') +
+    (tvil ? 'Hva hun tviler på eller tror hun ikke får til: ' + tvil + '\n' : '') +
+    (mer ? 'Mer om det: ' + mer + '\n' : '');
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1500,
+        system: SYSTEM,
+        messages: [{ role: 'user', content: userMsg }],
+        tools: [TOOL],
+        tool_choice: { type: 'tool', name: 'lever_navn' }
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      console.error('Anthropic-feil', r.status, JSON.stringify(data));
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen om litt.' });
+      return;
+    }
+    const tool = (data.content || []).find(function (c) { return c.type === 'tool_use'; });
+    const forslag = tool && tool.input && Array.isArray(tool.input.forslag) ? clean(tool.input.forslag) : [];
+    if (!forslag.length) {
+      console.error('Fant ingen forslag: ' + JSON.stringify(data.content || []).slice(0, 2000));
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen.' });
+      return;
+    }
+    res.status(200).json({ forslag: forslag.slice(0, 8) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Noe gikk galt. Prøv igjen om litt.' });
+  }
+};
