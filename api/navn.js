@@ -143,11 +143,15 @@ module.exports = async function handler(req, res) {
     }
     const blocks = data.content || [];
     const tool = blocks.find(function (c) { return c.type === 'tool_use'; });
-    let forslag = tool && tool.input && Array.isArray(tool.input.forslag) ? clean(tool.input.forslag) : [];
+    let raw = tool && tool.input ? tool.input.forslag : null;
+    if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (e) { raw = parseText(raw); } }
+    if (raw && !Array.isArray(raw) && Array.isArray(raw.forslag)) raw = raw.forslag;
+    if (!raw && tool && Array.isArray(tool.input)) raw = tool.input;
+    let forslag = Array.isArray(raw) ? clean(raw) : [];
     if (!forslag.length) forslag = parseText(blocks.map(function (c) { return c.text || ''; }).join('\n'));
     if (!forslag.length) {
       console.error('Fant ingen forslag: ' + JSON.stringify(data.content || []).slice(0, 2000));
-      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen.', detalj: 'tomt svar' });
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen.', detalj: 'kunne ikke lese svaret: ' + JSON.stringify(blocks).slice(0, 160) });
       return;
     }
     res.status(200).json({ forslag: forslag.slice(0, 8) });
