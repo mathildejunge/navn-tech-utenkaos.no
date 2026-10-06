@@ -78,7 +78,7 @@
   </nav>
 
   <h1>Bygg navnet ditt</h1>
-  <p class="lead">Ta utgangspunkt i setningen din fra dag 1. Du får 8 navn som sier hva hun får og hvor lang tid det tar, hvert med en undertittel som tar bort tvilen hennes. Velg det du liker, og pynt på det nederst.</p>
+  <p class="lead">Ta utgangspunkt i setningen din fra dag 1. Du får 8 navn som sier hva hun får, hvem det er for og hvor lang tid det tar, hvert med en undertittel som tar bort tvilen hennes. Velg det du liker, og pynt på det nederst.</p>
 
   <div class="bar">
     <div class="seg" id="mode">
@@ -99,8 +99,10 @@
       <input type="text" id="resultat" placeholder="f.eks. et ferdig landskapsmaleri hun kan henge på veggen">
     </div>
     <div class="field">
-      <p class="lbl">2 · Hvem er den for? <span class="opt">valgfritt</span></p>
-      <input type="text" id="hvem" placeholder="f.eks. voksne damer som aldri har malt">
+      <p class="lbl">2 · Hvem er den for?</p>
+      <p class="hint">Vær så spesifikk du kan. Navnet skal treffe henne, og ikke alle andre.</p>
+      <input type="text" id="hvem" placeholder="f.eks. mammaer til nevrodivergente barn">
+      <div class="ex">Ikke bare <b>mammaer</b>, men <b>mammaer til nevrodivergente barn</b>. Ikke bare <b>gründere</b>, men <b>kvinnelige gründere uten e-postliste</b>.</div>
     </div>
     <div class="field">
       <p class="lbl">3 · Hva tror hun at hun ikke får til? <span class="opt">valgfritt, men gjør navnet mye bedre</span></p>
@@ -109,8 +111,9 @@
       <div class="ex">Eksempler: <b>jeg er ikke teknisk</b>, <b>jeg har ikke tid</b>, <b>jeg er ikke kreativ</b></div>
     </div>
     <div class="field">
-      <p class="lbl">4 · Noe mer jeg bør vite? <span class="opt">valgfritt</span></p>
-      <textarea id="mer" placeholder="f.eks. vi maler med akvarell, og hver dag er en liten video på 15 minutter"></textarea>
+      <p class="lbl">4 · Lim inn dagene dine <span class="opt">valgfritt, men anbefalt</span></p>
+      <p class="hint">Navnet ligger ofte i en setning du allerede har skrevet. Lim inn skissen, så leter AI-en etter den.</p>
+      <textarea id="mer" style="min-height:110px" placeholder="Dag 1: ...&#10;Dag 2: ...&#10;Dag 3: ..."></textarea>
     </div>
     <div class="field" id="daysField">
       <p class="lbl">5 · Hvor mange dager?</p>
