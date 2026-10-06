@@ -10,7 +10,7 @@
 <style>
   :root{
     --bg:#000; --card:#111; --card2:#181818; --line:#2a2a2a; --text:#fff; --muted:#a8a8a8;
-    --pink:#ff66c4; --pinkText:#000; --chip:#1c1c1c; --input:#161616;
+    --pink:#ff66c4; --chip:#1c1c1c; --input:#161616;
   }
   :root[data-theme="light"]{
     --bg:#fff; --card:#f7f7f7; --card2:#fff; --line:#e3e3e3; --text:#000; --muted:#5c5c5c;
@@ -35,32 +35,37 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
   .lbl{font-family:Oswald,sans-serif;text-transform:uppercase;font-size:12px;letter-spacing:.06em;color:var(--pink);margin:0 0 2px}
   .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
-  .field{margin-bottom:14px}
-  .field:last-child{margin-bottom:0}
-  input[type=text]{width:100%;background:var(--input);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:10px 12px;font:inherit}
-  input[type=text]:focus{outline:2px solid var(--pink);outline-offset:0;border-color:transparent}
+  .field{margin-bottom:16px}
   .opt{color:var(--muted);font-family:Outfit,sans-serif;text-transform:none;letter-spacing:0;font-size:12px}
+  input[type=text],textarea{width:100%;background:var(--input);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:10px 12px;font:inherit}
+  textarea{min-height:70px;resize:vertical}
+  input[type=text]:focus,textarea:focus{outline:2px solid var(--pink);outline-offset:0;border-color:transparent}
   .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chip{border:1px solid var(--line);background:var(--chip);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
   .chip.on{background:var(--pink);border-color:var(--pink);color:#000}
   .ex{font-size:12px;color:var(--muted);margin-top:6px}
   .ex b{color:var(--text);font-weight:500}
+  .big{width:100%;padding:13px;font-size:15px;border-radius:10px;margin-top:4px}
+  .big:disabled{opacity:.6;cursor:wait}
+  .err{color:var(--pink);font-size:14px;margin-top:10px}
   .list{display:grid;gap:8px}
-  .name{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;color:var(--text);font:inherit;width:100%}
-  .name:hover{border-color:var(--pink)}
-  .name.on{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink)}
-  .name .t{font-family:Oswald,sans-serif;font-weight:600;font-size:18px;line-height:1.25}
-  .name .m{font-size:11px;color:var(--muted);white-space:nowrap}
-  .name .m.long{color:var(--pink)}
-  .empty{color:var(--muted);font-size:14px;padding:6px 0}
+  .sug{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;cursor:pointer;color:var(--text);font:inherit}
+  .sug:hover{border-color:var(--pink)}
+  .sug.on{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink)}
+  .sug .v{font-family:Oswald,sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;color:var(--pink);margin:0 0 2px}
+  .sug .n{font-family:Oswald,sans-serif;font-weight:600;font-size:19px;line-height:1.25}
+  .sug .u{color:var(--muted);font-size:14px;margin-top:3px}
   .final{background:var(--pink);color:#000;border-radius:14px;padding:16px;margin-bottom:10px}
   .final .lbl{color:#000}
-  .final input{background:transparent;border:0;border-bottom:1px solid rgba(0,0,0,.35);border-radius:0;color:#000;font-family:Oswald,sans-serif;font-weight:600;font-size:22px;padding:6px 0}
-  .final input:focus{outline:none;border-bottom-color:#000}
-  .final .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px}
+  .final input,.final textarea{background:transparent;border:0;border-bottom:1px solid rgba(0,0,0,.35);border-radius:0;color:#000;padding:6px 0}
+  .final input::placeholder,.final textarea::placeholder{color:rgba(0,0,0,.5)}
+  .final input:focus,.final textarea:focus{outline:none;border-bottom-color:#000}
+  #final{font-family:Oswald,sans-serif;font-weight:600;font-size:22px}
+  #finalSub{font-size:15px;margin-top:6px;min-height:0;resize:none;outline:none}
+  .final .row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px;gap:8px}
   .saved{margin-top:10px;font-size:13px}
   .tip{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
-  @media (max-width:520px){ h1{font-size:25px} .name .t{font-size:16px} }
+  @media (max-width:520px){ h1{font-size:25px} .sug .n{font-size:17px} }
 </style>
 </head>
 <body>
@@ -73,7 +78,7 @@
   </nav>
 
   <h1>Bygg navnet ditt</h1>
-  <p class="lead">Fyll inn det du skrev i setningen din på dag 1, så får du navneforslag som sier hva hun får. Tapp det du liker, og pynt på det nederst.</p>
+  <p class="lead">Fortell kort hva hun sitter igjen med og hva hun tviler på. Du får 8 navn, hvert med en undertittel som snakker rett til henne. Velg det du liker, og pynt på det nederst.</p>
 
   <div class="bar">
     <div class="seg" id="mode">
@@ -89,169 +94,164 @@
 
   <div class="card">
     <div class="field">
-      <p class="lbl">1 · Hva får hun?</p>
-      <p class="hint">Resultatet, med dine ord. Skriv det sånn at det passer etter «5 dager til ...»</p>
-      <input type="text" id="res" placeholder="f.eks. mer ro">
-      <div class="ex">Eksempler: <b>mer ro</b>, <b>harmoniske morgener</b>, <b>trygghet med tarotkortene</b>, <b>din egen challenge</b></div>
+      <p class="lbl">1 · Hva sitter hun igjen med?</p>
+      <p class="hint">Resultatet, med dine egne ord. Skrivefeil gjør ingenting.</p>
+      <input type="text" id="resultat" placeholder="f.eks. et ferdig landskapsmaleri hun kan henge på veggen">
     </div>
     <div class="field">
-      <p class="lbl">2 · Hva skal hun klare? <span class="opt">valgfritt</span></p>
-      <p class="hint">Skriv det som om du sier det til henne.</p>
-      <input type="text" id="verb" placeholder="f.eks. si nei">
-      <div class="ex">Eksempler: <b>si nei</b>, <b>les kortene dine selv</b>, <b>lag din egen challenge</b></div>
+      <p class="lbl">2 · Hvem er den for? <span class="opt">valgfritt</span></p>
+      <input type="text" id="hvem" placeholder="f.eks. voksne damer som aldri har malt">
     </div>
     <div class="field">
-      <p class="lbl">3 · Hvor står hun nå? <span class="opt">valgfritt</span></p>
-      <p class="hint">Ett eller to ord om det hun vil vekk fra.</p>
-      <input type="text" id="fra" placeholder="f.eks. stress">
-      <div class="ex">Eksempler: <b>stress</b>, <b>kaos</b>, <b>usikkerhet</b>, <b>tomt ark</b></div>
+      <p class="lbl">3 · Hva tror hun at hun ikke får til? <span class="opt">valgfritt, men gjør navnet mye bedre</span></p>
+      <p class="hint">Det hun sier til seg selv som stopper henne.</p>
+      <input type="text" id="tvil" placeholder="f.eks. «jeg kan ikke male»">
+      <div class="ex">Eksempler: <b>jeg er ikke teknisk</b>, <b>jeg har ikke tid</b>, <b>jeg er ikke kreativ</b></div>
     </div>
     <div class="field">
-      <p class="lbl">4 · Hva slipper hun? <span class="opt">valgfritt</span></p>
-      <p class="hint">Det hun gruer seg til, eller tror hun må gjennom.</p>
-      <input type="text" id="uten" placeholder="f.eks. dårlig samvittighet">
-      <div class="ex">Eksempler: <b>dårlig samvittighet</b>, <b>å stå opp tidligere</b>, <b>teknisk kaos</b></div>
-    </div>
-    <div class="field">
-      <p class="lbl">5 · Hvem er den for? <span class="opt">valgfritt</span></p>
-      <input type="text" id="hvem" placeholder="f.eks. nevromammaer">
+      <p class="lbl">4 · Noe mer jeg bør vite? <span class="opt">valgfritt</span></p>
+      <textarea id="mer" placeholder="f.eks. vi maler med akvarell, og hver dag er en liten video på 15 minutter"></textarea>
     </div>
     <div class="field" id="daysField">
-      <p class="lbl">6 · Hvor mange dager?</p>
+      <p class="lbl">5 · Hvor mange dager?</p>
       <div class="chips" id="days">
         <button class="chip" data-v="3">3 dager</button>
         <button class="chip" data-v="5">5 dager</button>
         <button class="chip" data-v="7">7 dager</button>
       </div>
     </div>
+    <button class="btn pink big" id="go">Lag navneforslag</button>
+    <div class="err" id="err"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="resCard" style="display:none">
     <p class="lbl">Navneforslag</p>
-    <p class="hint">Tapp et forslag for å velge det. Alle kan endres nederst.</p>
+    <p class="hint">Tapp et forslag for å velge det. Ikke fornøyd? Trykk Lag navneforslag igjen, så får du nye.</p>
     <div class="list" id="list"></div>
   </div>
 
   <div class="final">
     <p class="lbl">✨ Navnet jeg går for</p>
     <input type="text" id="final" placeholder="Tapp et forslag, eller skriv ditt eget">
+    <textarea id="finalSub" rows="2" placeholder="Undertittel"></textarea>
     <div class="row">
       <span id="count">0 tegn</span>
-      <button class="btn dark" id="save">Lagre navnet</button>
+      <span>
+        <button class="btn dark" id="copy">Kopier</button>
+        <button class="btn dark" id="save">Lagre navnet</button>
+      </span>
     </div>
     <div class="saved" id="saved"></div>
   </div>
-  <p class="tip">Tips: korte navn er sterkest, og navnet bør si resultatet, ikke verktøyet. Hvis de andre i communityet gjetter hva de får, fungerer navnet 💗</p>
+  <p class="tip">Tips: navnet sier resultatet, undertittelen tar bort tvilen. Trenger du en hook til innlegget? Bruk <a href="https://hook.tech-utenkaos.no" style="color:var(--pink)">Bygg hook</a> 💗</p>
 </div>
 
 <script>
 (function(){
-  var KEY = 'tuk-navn-v2';
-  var ids = ['res','verb','fra','uten','hvem','final'];
-  var state = { mode:'challenge', days:'5', theme:'dark', saved:'' };
-  ids.forEach(function(k){ state[k] = ''; });
-
-  function load(){ try{ var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if(s){ for(var k in s){ state[k] = s[k]; } } }catch(e){} }
-  function store(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
-
-  function clean(s){ return (s || '').trim().replace(/\s+/g,' ').replace(/[.!]+$/,''); }
-  function cap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
-  function low(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
-  function oneWord(s){ return s && s.indexOf(' ') === -1; }
-  function dropMer(s){ return s.replace(/^(mer|mye mer|litt mer)\s+/i,''); }
-
-  function build(){
-    var N = low(clean(state.res)), V = low(clean(state.verb)), F = low(clean(state.fra)),
-        U = low(clean(state.uten)), H = low(clean(state.hvem));
-    var D = state.days + ' dager';
-    var out = [];
-    function add(s, why){ if(s && out.every(function(o){ return o.t.toLowerCase() !== s.toLowerCase(); })) out.push({ t:s, why:why }); }
-
-    if(state.mode === 'challenge'){
-      if(N){
-        add(D + ' til ' + N, 'Dager + resultat');
-        add(cap(N) + ' på ' + D, 'Resultat + tid');
+  var KEY = 'tuk-navn-v3';
+  var fields = ['resultat','hvem','tvil','mer','final','finalSub'];
+  var state = { mode:'challenge', days:'5', theme:'dark', saved:'', forslag:[] };
+  fields.forEach(function(k){ state[k] = ''; });
+  var s = null;
+  try{ s = JSON.parse(localStorage.getItem(KEY) || 'null'); if(s){ for(var k in s) state[k] = s[k]; } }catch(e){}
+  // Flytt over det folk har lagret i tidligere versjoner av navnebyggeren, så ingenting forsvinner.
+  if(!s){
+    try{
+      var o2 = JSON.parse(localStorage.getItem('tuk-navn-v2') || 'null');
+      var o1 = JSON.parse(localStorage.getItem('tuk-name-builder-v4') || 'null');
+      var gml = o2 || o1;
+      if(gml){
+        if(gml.final) state.final = gml.final;
+        if(gml.saved) state.saved = gml.saved;
+        else if(o1 && o1.final) state.saved = o1.final;
+        if(gml.theme) state.theme = gml.theme;
+        if(gml.mode) state.mode = (gml.mode === 'challenge') ? 'challenge' : 'community';
+        if(o2){
+          if(o2.res) state.resultat = o2.res;
+          if(o2.hvem) state.hvem = o2.hvem;
+          if(o2.uten) state.tvil = o2.uten;
+          if(o2.days) state.days = o2.days;
+        }
+        store();
       }
-      if(V){
-        add(cap(V) + ' på ' + D, 'Handling + tid');
-      }
-      if(F && N) add('Fra ' + F + ' til ' + N, 'Fra, til');
-      if(F && N) add('Fra ' + F + ' til ' + N + ' på ' + D, 'Fra, til + tid');
-      if(N && U) add(cap(N) + ', uten ' + U, 'Resultat + det hun slipper');
-      if(V && U) add(cap(V) + ', uten ' + U, 'Handling + det hun slipper');
-      if(N && H) add(cap(N) + ' for ' + H, 'Resultat + hvem');
-      if(N && H) add(D + ' til ' + N + ' for ' + H, 'Dager + resultat + hvem');
-      if(N){
-        var core = dropMer(N);
-        if(oneWord(core)) add(cap(core) + '-uka', 'Kort og fengende');
-        if(oneWord(core)) add(D + ' med ' + core, 'Dager + kjerneordet');
-      }
-    } else {
-      if(N && H) add(cap(N) + ' for ' + H, 'Resultat + hvem');
-      if(H) add('Communityet for ' + H, 'Hvem det er for');
-      if(N){
-        var c2 = dropMer(N);
-        if(oneWord(c2)) add(cap(c2) + '-klubben', 'Kort og fengende');
-        add(cap(N) + ' sammen', 'Resultat + fellesskap');
-        add(cap(N) + ' i hverdagen', 'Resultat + hverdag');
-      }
-      if(F && N) add('Fra ' + F + ' til ' + N, 'Fra, til');
-      if(N && U) add(cap(N) + ', uten ' + U, 'Resultat + det hun slipper');
-      if(V) add(cap(V) + ', sammen', 'Handling + fellesskap');
-    }
-    return out;
+    }catch(e){}
   }
+  function store(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function $(id){ return document.getElementById(id); }
 
-  var list = document.getElementById('list');
-  function render(){
-    var names = build();
+  var list = $('list');
+  function renderList(){
     list.innerHTML = '';
-    if(!names.length){
-      list.innerHTML = '<div class="empty">Skriv hva hun får i felt 1, så dukker forslagene opp her.</div>';
-    }
-    names.forEach(function(n){
+    $('resCard').style.display = state.forslag.length ? '' : 'none';
+    state.forslag.forEach(function(f){
       var b = document.createElement('button');
-      b.className = 'name' + (clean(state.final).toLowerCase() === n.t.toLowerCase() ? ' on' : '');
-      var len = n.t.length;
-      b.innerHTML = '<span class="t"></span><span class="m' + (len > 40 ? ' long' : '') + '"></span>';
-      b.querySelector('.t').textContent = n.t;
-      b.querySelector('.m').textContent = len > 40 ? len + ' tegn, litt langt' : len + ' tegn';
-      b.title = n.why;
+      b.className = 'sug' + ((state.final || '').trim().toLowerCase() === f.navn.toLowerCase() ? ' on' : '');
+      b.innerHTML = '<p class="v"></p><div class="n"></div><div class="u"></div>';
+      b.querySelector('.v').textContent = f.vinkel;
+      b.querySelector('.n').textContent = f.navn;
+      b.querySelector('.u').textContent = f.undertittel;
       b.addEventListener('click', function(){
-        state.final = n.t; document.getElementById('final').value = n.t; store(); render(); updCount();
+        state.final = f.navn; state.finalSub = f.undertittel;
+        $('final').value = f.navn; $('finalSub').value = f.undertittel;
+        store(); renderList(); count();
       });
       list.appendChild(b);
     });
+  }
+  function renderUi(){
     document.querySelectorAll('#mode button').forEach(function(x){ x.classList.toggle('on', x.dataset.v === state.mode); });
     document.querySelectorAll('#days .chip').forEach(function(x){ x.classList.toggle('on', x.dataset.v === state.days); });
-    document.getElementById('daysField').style.display = state.mode === 'challenge' ? '' : 'none';
+    $('daysField').style.display = state.mode === 'challenge' ? '' : 'none';
     document.documentElement.setAttribute('data-theme', state.theme);
-    document.getElementById('theme').textContent = state.theme === 'light' ? 'Mørkt tema' : 'Lyst tema';
-    document.getElementById('saved').textContent = state.saved ? 'Lagret: ' + state.saved + ' 💗' : '';
+    $('theme').textContent = state.theme === 'light' ? 'Mørkt tema' : 'Lyst tema';
+    $('saved').textContent = state.saved ? 'Lagret: ' + state.saved + ' 💗' : '';
   }
-  function updCount(){ document.getElementById('count').textContent = clean(state.final).length + ' tegn'; }
+  function count(){ $('count').textContent = (state.final || '').trim().length + ' tegn'; }
 
-  load();
-  ids.forEach(function(k){
-    var el = document.getElementById(k);
-    el.value = state[k] || '';
-    el.addEventListener('input', function(){ state[k] = el.value; store(); if(k === 'final'){ updCount(); } render(); });
+  fields.forEach(function(k){
+    var el = $(k); el.value = state[k] || '';
+    el.addEventListener('input', function(){ state[k] = el.value; store(); if(k === 'final'){ count(); renderList(); } });
   });
   document.querySelectorAll('#mode button').forEach(function(b){
-    b.addEventListener('click', function(){ state.mode = b.dataset.v; store(); render(); });
+    b.addEventListener('click', function(){ state.mode = b.dataset.v; store(); renderUi(); });
   });
   document.querySelectorAll('#days .chip').forEach(function(b){
-    b.addEventListener('click', function(){ state.days = b.dataset.v; store(); render(); });
+    b.addEventListener('click', function(){ state.days = b.dataset.v; store(); renderUi(); });
   });
-  document.getElementById('theme').addEventListener('click', function(){ state.theme = state.theme === 'light' ? 'dark' : 'light'; store(); render(); });
-  document.getElementById('save').addEventListener('click', function(){ state.saved = clean(state.final); store(); render(); });
-  document.getElementById('reset').addEventListener('click', function(){
+  $('theme').addEventListener('click', function(){ state.theme = state.theme === 'light' ? 'dark' : 'light'; store(); renderUi(); });
+  $('save').addEventListener('click', function(){
+    var n = (state.final || '').trim(), u = (state.finalSub || '').trim();
+    state.saved = u ? n + '. ' + u : n; store(); renderUi();
+  });
+  $('copy').addEventListener('click', function(){
+    var n = (state.final || '').trim(), u = (state.finalSub || '').trim(), b = this;
+    try{ navigator.clipboard.writeText(u ? n + '\n' + u : n); }catch(e){}
+    b.textContent = 'Kopiert ✓'; setTimeout(function(){ b.textContent = 'Kopier'; }, 1500);
+  });
+  $('reset').addEventListener('click', function(){
     var b = this;
     if(b.dataset.sure !== '1'){ b.dataset.sure = '1'; b.textContent = 'Sikker? Trykk igjen'; setTimeout(function(){ b.dataset.sure=''; b.textContent='Nullstill'; }, 3000); return; }
-    ids.forEach(function(k){ state[k] = ''; document.getElementById(k).value = ''; });
-    state.saved = ''; state.days = '5'; b.dataset.sure=''; b.textContent='Nullstill'; store(); render(); updCount();
+    fields.forEach(function(k){ state[k] = ''; $(k).value = ''; });
+    state.saved = ''; state.days = '5'; state.forslag = []; b.dataset.sure=''; b.textContent='Nullstill';
+    store(); renderUi(); renderList(); count();
   });
-  render(); updCount();
+
+  var go = $('go'), err = $('err');
+  go.addEventListener('click', async function(){
+    err.textContent = '';
+    if((state.resultat || '').trim().length < 3){ err.textContent = 'Skriv hva hun sitter igjen med først 💗'; return; }
+    go.disabled = true; go.textContent = 'Lager navn, et øyeblikk ...';
+    try{
+      var r = await fetch('/api/navn', { method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({ resultat: state.resultat, hvem: state.hvem, tvil: state.tvil, mer: state.mer, mode: state.mode, days: state.days }) });
+      var data = await r.json();
+      if(!r.ok || !data.forslag || !data.forslag.length){ err.textContent = (data && data.error) || 'Noe gikk galt, prøv igjen.'; }
+      else { state.forslag = data.forslag; store(); renderList(); $('resCard').scrollIntoView({behavior:'smooth', block:'start'}); }
+    }catch(e){ err.textContent = 'Fikk ikke kontakt. Sjekk nettet og prøv igjen.'; }
+    go.disabled = false; go.textContent = 'Lag navneforslag';
+  });
+
+  renderUi(); renderList(); count();
 })();
 </script>
 </body>
