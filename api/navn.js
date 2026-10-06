@@ -117,7 +117,7 @@ module.exports = async function handler(req, res) {
     (tvil ? 'Hva hun tviler på eller tror hun ikke får til: ' + tvil + '\n' : '') +
     (mer ? 'Mer om det: ' + mer + '\n' : '');
 
-  try {
+  async function ask() {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -127,7 +127,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1500,
+        max_tokens: 8000,
         system: SYSTEM,
         messages: [{ role: 'user', content: userMsg }],
         tools: [TOOL],
@@ -137,24 +137,31 @@ module.exports = async function handler(req, res) {
     const data = await r.json();
     if (!r.ok) {
       console.error('Anthropic-feil', r.status, JSON.stringify(data));
-      const msg = (data && data.error && data.error.message) || ('status ' + r.status);
-      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen om litt.', detalj: msg });
-      return;
+      return { feil: (data && data.error && data.error.message) || ('status ' + r.status) };
     }
     const blocks = data.content || [];
     const tool = blocks.find(function (c) { return c.type === 'tool_use'; });
     let raw = tool && tool.input ? tool.input.forslag : null;
     if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (e) { raw = parseText(raw); } }
     if (raw && !Array.isArray(raw) && Array.isArray(raw.forslag)) raw = raw.forslag;
-    if (!raw && tool && Array.isArray(tool.input)) raw = tool.input;
     let forslag = Array.isArray(raw) ? clean(raw) : [];
     if (!forslag.length) forslag = parseText(blocks.map(function (c) { return c.text || ''; }).join('\n'));
-    if (!forslag.length) {
-      console.error('Fant ingen forslag: ' + JSON.stringify(data.content || []).slice(0, 2000));
-      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen.', detalj: 'kunne ikke lese svaret: ' + JSON.stringify(blocks).slice(0, 160) });
+    if (!forslag.length) console.error('Tomt svar (' + data.stop_reason + '): ' + JSON.stringify(blocks).slice(0, 1500));
+    return { forslag: forslag, stop: data.stop_reason };
+  }
+
+  try {
+    let svar = await ask();
+    if (!svar.feil && !svar.forslag.length) svar = await ask(); // prøv én gang til
+    if (svar.feil) {
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen om litt.', detalj: svar.feil });
       return;
     }
-    res.status(200).json({ forslag: forslag.slice(0, 8) });
+    if (!svar.forslag.length) {
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Trykk en gang til.', detalj: 'tomt svar, ' + svar.stop });
+      return;
+    }
+    res.status(200).json({ forslag: svar.forslag.slice(0, 8) });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Noe gikk galt. Prøv igjen om litt.' });
