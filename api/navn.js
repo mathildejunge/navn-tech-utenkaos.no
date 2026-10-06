@@ -117,23 +117,31 @@ module.exports = async function handler(req, res) {
     (tvil ? 'Hva hun tviler på eller tror hun ikke får til: ' + tvil + '\n' : '') +
     (mer ? 'Mer om det: ' + mer + '\n' : '');
 
-  async function ask() {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+  async function call(noThink) {
+    const payload = {
+      model: MODEL,
+      max_tokens: 3000,
+      system: SYSTEM,
+      messages: [{ role: 'user', content: userMsg }],
+      tools: [TOOL],
+      tool_choice: { type: 'auto' }
+    };
+    if (noThink) payload.thinking = { type: 'disabled' };
+    return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
         'x-api-key': key,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 8000,
-        system: SYSTEM,
-        messages: [{ role: 'user', content: userMsg }],
-        tools: [TOOL],
-        tool_choice: { type: 'auto' }
-      })
+      body: JSON.stringify(payload)
     });
+  }
+
+  async function ask() {
+    // Uten tenking går det mye raskere. Godtar ikke modellen det, prøver vi vanlig.
+    let r = await call(true);
+    if (r.status === 400) r = await call(false);
     const data = await r.json();
     if (!r.ok) {
       console.error('Anthropic-feil', r.status, JSON.stringify(data));
