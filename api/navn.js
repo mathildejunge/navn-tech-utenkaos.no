@@ -41,7 +41,7 @@ REGLER
 - Lim aldri brukerens ord ordrett inn i en mal. Skriv om, rett skrivefeil og gjør det bedre.
 - Er det et community og ikke en challenge, lag navn som fungerer over tid (ikke bundet til dager), men gjettetesten gjelder fortsatt.
 
-Lever ALLTID de 8 forslagene ved å kalle verktøyet lever_navn, og skriv ingenting annet. «vinkel» er det norske navnet på vinkelen du brukte.`;
+Lever ALLTID de 8 forslagene ved å kalle verktøyet lever_navn, og skriv ingenting annet. Hvis du av en eller annen grunn ikke kan bruke verktøyet, skriv ett forslag per linje i formatet: vinkel :: navn :: undertittel «vinkel» er det norske navnet på vinkelen du brukte.`;
 
 const TOOL = {
   name: 'lever_navn',
@@ -131,20 +131,23 @@ module.exports = async function handler(req, res) {
         system: SYSTEM,
         messages: [{ role: 'user', content: userMsg }],
         tools: [TOOL],
-        tool_choice: { type: 'tool', name: 'lever_navn' }
+        tool_choice: { type: 'auto' }
       })
     });
     const data = await r.json();
     if (!r.ok) {
       console.error('Anthropic-feil', r.status, JSON.stringify(data));
-      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen om litt.' });
+      const msg = (data && data.error && data.error.message) || ('status ' + r.status);
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen om litt.', detalj: msg });
       return;
     }
-    const tool = (data.content || []).find(function (c) { return c.type === 'tool_use'; });
-    const forslag = tool && tool.input && Array.isArray(tool.input.forslag) ? clean(tool.input.forslag) : [];
+    const blocks = data.content || [];
+    const tool = blocks.find(function (c) { return c.type === 'tool_use'; });
+    let forslag = tool && tool.input && Array.isArray(tool.input.forslag) ? clean(tool.input.forslag) : [];
+    if (!forslag.length) forslag = parseText(blocks.map(function (c) { return c.text || ''; }).join('\n'));
     if (!forslag.length) {
       console.error('Fant ingen forslag: ' + JSON.stringify(data.content || []).slice(0, 2000));
-      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen.' });
+      res.status(502).json({ error: 'Klarte ikke lage navn akkurat nå. Prøv igjen.', detalj: 'tomt svar' });
       return;
     }
     res.status(200).json({ forslag: forslag.slice(0, 8) });
@@ -153,3 +156,19 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: 'Noe gikk galt. Prøv igjen om litt.' });
   }
 };
+
+function parseText(text) {
+  var out = [];
+  text.split(/\r?\n/).forEach(function (line) {
+    var parts = line.replace(/^[-*\d.)\s]+/, '').split('::');
+    if (parts.length >= 3) out.push({ vinkel: parts[0], navn: parts[1], undertittel: parts.slice(2).join(' ') });
+  });
+  if (!out.length) {
+    try {
+      var m = text.match(/\{[\s\S]*\}/);
+      var j = m ? JSON.parse(m[0]) : null;
+      (j && j.forslag || []).forEach(function (f) { out.push(f); });
+    } catch (e) {}
+  }
+  return clean(out);
+}

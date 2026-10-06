@@ -245,7 +245,7 @@
       var r = await fetch('/api/navn', { method:'POST', headers:{'content-type':'application/json'},
         body: JSON.stringify({ resultat: state.resultat, hvem: state.hvem, tvil: state.tvil, mer: state.mer, mode: state.mode, days: state.days }) });
       var data = await r.json();
-      if(!r.ok || !data.forslag || !data.forslag.length){ err.textContent = (data && data.error) || 'Noe gikk galt, prøv igjen.'; }
+      if(!r.ok || !data.forslag || !data.forslag.length){ err.textContent = ((data && data.error) || 'Noe gikk galt, prøv igjen.') + (data && data.detalj ? ' (' + data.detalj + ')' : ''); }
       else { state.forslag = data.forslag; store(); renderList(); $('resCard').scrollIntoView({behavior:'smooth', block:'start'}); }
     }catch(e){ err.textContent = 'Fikk ikke kontakt. Sjekk nettet og prøv igjen.'; }
     go.disabled = false; go.textContent = 'Lag navneforslag';
